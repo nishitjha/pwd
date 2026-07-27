@@ -14,7 +14,3 @@ file(GLOB SOURCES "src/*.c")
 add_executable(pwd ${SOURCES})
 
 target_include_directories(pwd PRIVATE src)
-target_include_directories(pwd PRIVATE ${SODIUM_INCLUDE_DIRS})
-target_link_libraries(pwd PRIVATE ${SODIUM_LIBRARIES})
-target_link_directories(pwd PRIVATE ${SODIUM_LIBRARY_DIRS})
-target_link_libraries(pwd PRIVATE ${SODIUM_LIBRARIES})
