@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 const int8_t BASE32_DECODE_MAP[256] = {
     ['A'] = 0,
@@ -34,16 +36,18 @@ const int8_t BASE32_DECODE_MAP[256] = {
     ['5'] = 29,
     ['6'] = 30,
     ['7'] = 31};
+ 
 
-char* decode(char* secret32, u_int8_t * dest) {
-    //figure out how to decode base-32 
-    // from what I read it seems like base32 often makes use of padding (= signs) to ensure a constant length. 
-    // i was gonna trim those and then decode the string but it turns out that many great men before me have tried this and failed (as seen on some github issues you need some big ooga booga logic to fix improper padding)
-    // so fuck it we ball
+void decode(char* secret32, uint8_t output_bytes[64], size_t* output_length) {
+    // from what I read it seems like base32 often makes use of padding (= signs) to ensure a constant length. so we'll skip those
 
     char secretCopy[256];
     strncpy(secretCopy, secret32, sizeof(secretCopy) - 1);
     secretCopy[sizeof(secretCopy) - 1] = '\0';
+
+    uint32_t buffer = 0;
+    int bitsInBuffer = 0;
+    int bytes = 0;
 
     /*for (int i = strlen(secret32) - 1; i >= 0; i--){
         if (secret32[i] == '='){
@@ -55,9 +59,25 @@ char* decode(char* secret32, u_int8_t * dest) {
         }
     }*/
 
-    for (int i = 0; i < strlen(secretCopy); i++) {
-        secretCopy[i] = ((unsigned char)secretCopy[i]);
+    for (uint8_t i = 0; i < strlen(secretCopy); i++) {
+        if (secret32[i] == '=')
+        {
+            continue;
+        }
+
+        int num = BASE32_DECODE_MAP[(unsigned char)secretCopy[i]];
+        buffer = (buffer << 5) | num;
+        bitsInBuffer += 5;
+
+        while (bitsInBuffer >= 8)
+        {
+            uint8_t byteFull = (buffer >> (bitsInBuffer - 8)) & 0xFF;
+            output_bytes[bytes] = byteFull;
+
+            bytes++;
+            bitsInBuffer -= 8;
+        }
     }
 
-    
+    *output_length = bytes;
 }

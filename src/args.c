@@ -1,8 +1,10 @@
-#include "generate.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdint.h>
+#include "generate.h"
 
 char* toLower(const char* src, char* dest) {
     int i = 0;
@@ -36,7 +38,14 @@ int parse_args(int argc, char *argv[]) {
                     printf("Please provide the app name to add a new entry. \n");
                     return -1;
                 }
-                printf("Generated password: %s \n", generate(atoi(argv[2] ? argv[2] : "12"), atoi(argv[3] ? argv[3] : "0")));
+                TOTP totp = generate();
+                printf("Added new entry for %s with TOTP: (length: %zu). \n", argv[2], totp.totp_length);
+                printf("TOTP bytes: ");
+                for (size_t j = 0; j < totp.totp_length; j++) {
+                    printf("%02x", totp.totp[j]);
+                }
+                printf("\n");
+
                 found = 1;
                 break;
             case 1:
@@ -45,7 +54,6 @@ int parse_args(int argc, char *argv[]) {
                     printf("Please provide the app name to get its TOTP. \n");
                     return -1;
                 }
-                printf("Generated password for %s: %s \n", argv[2], generate(atoi(argv[3] ? argv[3] : "12"), atoi(argv[4] ? argv[4] : "0")));
                 found = 1;
                 break;
             case 2:

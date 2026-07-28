@@ -1,6 +1,11 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
-const char* generate(int length, int min);
+typedef struct {
+    uint8_t totp[64];
+    size_t totp_length;
+} TOTP;
+
+TOTP generate();
 
 #endif
