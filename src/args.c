@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <stdint.h>
 #include "generate.h"
+#include "io.h"
 
 char* toLower(const char* src, char* dest) {
     int i = 0;
@@ -32,7 +33,7 @@ int parse_args(int argc, char *argv[]) {
         toLower(commands[i], lowerCmd);
         if (strcmp(lowerCmd, lowerArg) == 0) {
             switch (i){
-            case 0:
+            case 0:;
                 //add new app
                 if (argv[2] == NULL)
                 {
@@ -44,12 +45,16 @@ int parse_args(int argc, char *argv[]) {
                     printf("Please provide the base32 secret for the TOTP. \n");
                     return -1;
                 }
+                addNewEntry(argv[2], argv[3]);
+                printf("Added new entry for %s. Updated list of apps:\n", argv[2]);
+                long entriesSize;
+                uint8_t *entries = getEntries(&entriesSize);
 
-                char totp_string[7];
-                generate(argv[3], totp_string);
-                printf("Added new entry for %s (didn't actually but you know) \n",argv[2]);
-                printf("Your TOTP is: %s \n", totp_string);
-
+                for (long i = 0; i < entriesSize; i++)
+                {
+                    putchar(entries[i]);
+                }
+                free(entries);
                 found = 1;
                 break;
             case 1:
@@ -58,6 +63,11 @@ int parse_args(int argc, char *argv[]) {
                     printf("Please provide the app name to get its TOTP. \n");
                     return -1;
                 }
+
+                char totp_string[7];
+                generate("AQHIPAAGYZ3BK2HZ", totp_string); //hardcoded for now
+                printf("Your TOTP (hardcoded secret) is: %s \n", totp_string);
+
                 found = 1;
                 break;
             case 2:
@@ -69,9 +79,15 @@ int parse_args(int argc, char *argv[]) {
                 printf("Removed entry for %s. \n", argv[2]);
                 found = 1;
                 break;
-            case 3:
+            case 3:;
                 // list apps
-                printf("Listing all apps: \n");
+                long allEntriesSize;
+                uint8_t *allEntries = getEntries(&allEntriesSize);
+
+                for (long i = 0; i < allEntriesSize; i++) {
+                    putchar(allEntries[i]);
+                }
+                free(allEntries);
                 found = 1;
                 break;
             case 4:
