@@ -4,5 +4,7 @@
 
 void addNewEntry(const char *appName, const char *secret);
 uint8_t* getEntries(long *destSize);
+char* getSecret(const char *appName);
+int removeEntry(const char *appName);
 
 #endif

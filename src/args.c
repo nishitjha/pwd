@@ -37,16 +37,16 @@ int parse_args(int argc, char *argv[]) {
                 //add new app
                 if (argv[2] == NULL)
                 {
-                    printf("Please provide the app name to add a new entry. \n");
+                    printf("Look at this moron who forgot to pass in the app name. Use the \"help\" command, maybe? \n");
                     return -1;
                 }
                 if (argv[3] == NULL)
                 {
-                    printf("Please provide the base32 secret for the TOTP. \n");
+                    printf("You fucking moron. Pass in the base32 secret for the TOTP. Use the \"help\" command, maybe? \n");
                     return -1;
                 }
                 addNewEntry(argv[2], argv[3]);
-                printf("Added new entry for %s. Updated list of apps:\n", argv[2]);
+                printf("Added new entry for \"%s\". Updated list of apps:\n", argv[2]);
                 long entriesSize;
                 uint8_t *entries = getEntries(&entriesSize);
 
@@ -60,23 +60,28 @@ int parse_args(int argc, char *argv[]) {
             case 1:
                 // get totp for app
                 if (argc < 3) {
-                    printf("Please provide the app name to get its TOTP. \n");
+                    printf("Me when I achieve my goal of looking like an absolute clown by not passing in the app name. \n");
                     return -1;
                 }
 
                 char totp_string[7];
-                generate("AQHIPAAGYZ3BK2HZ", totp_string); //hardcoded for now
-                printf("Your TOTP (hardcoded secret) is: %s \n", totp_string);
+                generate(getSecret(argv[2]), totp_string); 
+                printf("Your TOTP for \"%s\" is: %s \n", argv[2], totp_string);
 
                 found = 1;
                 break;
             case 2:
                 // remove app
                 if (argc < 3) {
-                    printf("Please provide the app name to remove an entry. \n");
+                    printf("Which fucking app should I remove from the list? Try passing in a name, fatass.\n");
                     return -1;
                 }
-                printf("Removed entry for %s. \n", argv[2]);
+                int status = removeEntry(argv[2]);
+
+                if (status == 0) {
+                    printf("Removed entry for \"%s\". \n", argv[2]);
+                }
+
                 found = 1;
                 break;
             case 3:;
@@ -84,17 +89,22 @@ int parse_args(int argc, char *argv[]) {
                 long allEntriesSize;
                 uint8_t *allEntries = getEntries(&allEntriesSize);
 
+                if (allEntriesSize == 0) {
+                    printf("You haven't set up 2FA for any apps yet. Use 'add' to add a new app. \n");
+                    return 0;
+                }
                 for (long i = 0; i < allEntriesSize; i++) {
                     putchar(allEntries[i]);
                 }
+
                 free(allEntries);
                 found = 1;
                 break;
             case 4:
                 // help
                 printf("Available commands: \n");
-                printf("  add <length> <min> - Add a new app with the specified password length and minimum value. \n");
-                printf("  get <app_name> <length> <min> - Get the password for the specified app with the given length and minimum value. \n");
+                printf("  add <app_name> <secret> - Add a new app with the specified name and base32 secret. \n");
+                printf("  get <app_name> - Get the current TOTP for the specified app. \n");
                 printf("  remove <app_name> - Remove the specified app entry. \n");
                 printf("  list - List all apps. \n");
                 printf("  help - Show this help message. \n");
