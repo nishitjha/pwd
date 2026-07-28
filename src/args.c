@@ -34,17 +34,21 @@ int parse_args(int argc, char *argv[]) {
             switch (i){
             case 0:
                 //add new app
-                if (argc < 3) {
+                if (argv[2] == NULL)
+                {
                     printf("Please provide the app name to add a new entry. \n");
                     return -1;
                 }
-                TOTP totp = generate();
-                printf("Added new entry for %s with TOTP: (length: %zu). \n", argv[2], totp.totp_length);
-                printf("TOTP bytes: ");
-                for (size_t j = 0; j < totp.totp_length; j++) {
-                    printf("%02x", totp.totp[j]);
+                if (argv[3] == NULL)
+                {
+                    printf("Please provide the base32 secret for the TOTP. \n");
+                    return -1;
                 }
-                printf("\n");
+
+                char totp_string[7];
+                generate(argv[3], totp_string);
+                printf("Added new entry for %s (didn't actually but you know) \n",argv[2]);
+                printf("Your TOTP is: %s \n", totp_string);
 
                 found = 1;
                 break;
