@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <ctype.h>
 
 const int8_t BASE32_DECODE_MAP[256] = {
     ['A'] = 0,
@@ -60,12 +61,12 @@ void decode(char* secret32, uint8_t output_bytes[64], size_t* output_length) {
     }*/
 
     for (uint8_t i = 0; i < strlen(secretCopy); i++) {
-        if (secret32[i] == '=')
+        if (secret32[i] == '=' || secret32[i] == ' ')
         {
             continue;
         }
 
-        int num = BASE32_DECODE_MAP[(unsigned char)secretCopy[i]];
+        int num = BASE32_DECODE_MAP[(unsigned char)toupper((unsigned char)secretCopy[i])];
         buffer = (buffer << 5) | num;
         bitsInBuffer += 5;
 
