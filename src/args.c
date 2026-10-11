@@ -58,14 +58,21 @@ int parse_args(int argc, char *argv[]) {
                 found = 1;
                 break;
             case 1:
-                // get totp for app
-                if (argc < 3) {
+                if (argc < 3)
+                {
                     printf("Me when I achieve my goal of looking like an absolute clown by not passing in the app name. \n");
                     return -1;
                 }
 
                 char totp_string[7];
-                generate(getSecret(argv[2]), totp_string); 
+                char *secret = getSecret(argv[2]);
+                if (secret == NULL)
+                {
+                    printf("No entry found for \"%s\".\n", argv[2]);
+                    return -1;
+                }
+                generate(secret, totp_string);
+                free(secret);
                 printf("Your TOTP for \"%s\" is: %s \n", argv[2], totp_string);
 
                 found = 1;
